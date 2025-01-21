@@ -183,6 +183,10 @@ spec:
             - name: certs
               mountPath: /bitnami/certs
            {{- end }}
+           {{- if or .Values.dataPlane.clientTls.existingSecret .Values.dataPlane.clientTls.ca }}
+            - name: client-certs
+              mountPath: /bitnami/certs/client/
+           {{- end }}
            {{- if and .Values.controlPlane.enabled .Values.controlPlane.tls.enabled}}
             - name: control-plane-certs
               mountPath: /etc/ssl/certs/{{ .Values.controlPlane.tls.certCAFilename }}
@@ -207,6 +211,11 @@ spec:
         - name: certs
           secret:
             secretName: {{ template "apisix.data-plane.tlsSecretName" . }}
+        {{- end }}
+        {{- if or .Values.dataPlane.clientTls.existingSecret .Values.dataPlane.clientTls.ca }}
+        - name: client-certs
+          secret:
+            secretName: {{ template "apisix.data-plane.clientTlsSecretName" . }}
         {{- end }}
         - name: empty-dir
           emptyDir: {}

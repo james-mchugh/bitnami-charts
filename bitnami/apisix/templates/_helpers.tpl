@@ -39,6 +39,15 @@ Return the proper APISIX Data-Plane fullname (with namespace)
 {{- end -}}
 {{- end -}}
 
+{{- define "apisix.data-plane.clientTlsSecretName" -}}
+{{- if .Values.dataPlane.clientTls.existingSecret -}}
+    {{- include "common.tplvalues.render" (dict "value" .Values.dataPlane.clientTls.existingSecret "context" $) -}}
+{{- else -}}
+    {{- printf "%s-client-tls" (include "apisix.data-plane.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+
 {{/*
 Create the name of the service account to use (APISIX Data-Plane)
 */}}

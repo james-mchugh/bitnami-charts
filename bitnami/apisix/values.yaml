@@ -314,16 +314,14 @@ dataPlane:
         user: "{{ print "{{APISIX_ETCD_USER}}" }}"
         password: "{{ print "{{APISIX_ETCD_PASSWORD}}" }}"
         {{- end }}
-      {{- if .Values.dataPlane.tls.enabled }}
       certs:
         {{- if .Values.dataPlane.tls.enabled }}
         cert: /bitnami/certs/{{ .Values.dataPlane.tls.certFilename }}
         cert_key: /bitnami/certs/{{ .Values.dataPlane.tls.certKeyFilename }}
-        {{- if .Values.dataPlane.tls.certCAFilename }}
-        client_ca_cert: /bitnami/certs/{{ .Values.dataPlane.tls.certCAFilename }}
         {{- end }}
+        {{- if or .Values.dataPlane.clientTls.ca .Values.dataPlane.clientTls.existingSecret }}
+        client_ca_cert: /bitnami/certs/client/{{ .Values.dataPlane.clientTls.certCAFilename }}
         {{- end }}
-      {{- end }}
     discovery:
       kubernetes:
         service:
@@ -378,6 +376,20 @@ dataPlane:
     ## @param dataPlane.tls.ca Content of the certificate CA to be added to the secret
     ##
     ca: ""
+
+  ## Client TLS CA configuration for allowing Apisix to establish TLS connections with trusted services
+  ##
+  clientTls:
+    ## @param dataPlane.clientTls.existingSecret Name of a secret containing the CA root
+    ##
+    existingSecret: ""
+    ## @param dataPlane.clientTls.certCAFilename Path of the certificate CA file when mounted as a secret
+    ##
+    certCAFilename: ca.crt
+    ## @param dataPlane.clientTls.ca Content of the client certificate CA to be added to the secret
+    ##
+    ca: ""
+
   ## @param dataPlane.podLabels Extra labels for APISIX pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
